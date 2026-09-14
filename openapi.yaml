@@ -1,0 +1,659 @@
+openapi: 3.0.3
+info:
+  title: Valorink
+  version: 0.1.0
+  description: >-
+    Multiplicative insights-value-chain health and P&L attribution. Scores Data,
+    Analytics, IT, People, and Processes links, governs man-plus-machine enrichment,
+    and attests non-additive business impact.
+  x-product-slug: ai-enterprise-valorink
+  x-source: ai-in-enterprise/Achieving-business-impact-with-data_FINAL/
+servers:
+  - url: https://api.example.com
+tags:
+  - name: UseCases
+    description: Business-backwards analytics use case portfolio
+  - name: ChainHealth
+    description: Multiplicative link health scoring
+  - name: Enrichment
+    description: Domain hypothesis and smart-variable governance
+  - name: Actions
+    description: Downstream action and process redesign bindings
+  - name: Impact
+    description: Finance-attested P&L claims
+  - name: Privacy
+    description: Privacy and security gating
+  - name: Governance
+    description: AQ coverage, remediation, and audit
+paths:
+  /v1/use-cases:
+    get:
+      operationId: listUseCases
+      tags: [UseCases]
+      security: [{ ApiKeyAuth: [] }, { BearerAuth: [] }]
+      parameters:
+        - $ref: "#/components/parameters/Cursor"
+        - $ref: "#/components/parameters/Limit"
+        - name: category
+          in: query
+          schema: { type: string, enum: [top_line, bottom_line, new_business_model] }
+      responses:
+        "200":
+          description: Use cases page
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ListEnvelopeUseCase" }
+    post:
+      operationId: createUseCase
+      tags: [UseCases]
+      security: [{ BearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/UseCase" }
+      responses:
+        "201":
+          description: Use case created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DataEnvelopeUseCase" }
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+  /v1/use-cases/{useCaseId}:
+    parameters:
+      - name: useCaseId
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      operationId: getUseCase
+      tags: [UseCases]
+      security: [{ BearerAuth: [] }]
+      responses:
+        "200":
+          description: Use case
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DataEnvelopeUseCase" }
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /v1/use-cases/{useCaseId}/link-health:
+    parameters:
+      - name: useCaseId
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      operationId: getLinkHealth
+      tags: [ChainHealth]
+      security: [{ BearerAuth: [] }]
+      responses:
+        "200":
+          description: Link health scores
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ListEnvelopeLinkHealthScore" }
+    post:
+      operationId: upsertLinkHealth
+      tags: [ChainHealth]
+      security: [{ ApiKeyAuth: [] }, { BearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/LinkHealthScore" }
+      responses:
+        "200":
+          description: Link health upserted
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DataEnvelopeLinkHealthScore" }
+  /v1/use-cases/{useCaseId}/scale-gate:
+    parameters:
+      - name: useCaseId
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: evaluateScaleGate
+      tags: [ChainHealth]
+      security: [{ BearerAuth: [] }]
+      responses:
+        "200":
+          description: Scale permitted
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DataEnvelopeUseCase" }
+        "409":
+          description: Blocked by critical-red multiplicative link
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Problem" }
+  /v1/enrichment-hypotheses:
+    get:
+      operationId: listEnrichmentHypotheses
+      tags: [Enrichment]
+      security: [{ BearerAuth: [] }]
+      parameters:
+        - name: useCaseId
+          in: query
+          schema: { type: string }
+        - $ref: "#/components/parameters/Cursor"
+        - $ref: "#/components/parameters/Limit"
+      responses:
+        "200":
+          description: Enrichment hypotheses
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ListEnvelopeEnrichmentHypothesis" }
+    post:
+      operationId: createEnrichmentHypothesis
+      tags: [Enrichment]
+      security: [{ BearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/EnrichmentHypothesis" }
+      responses:
+        "201":
+          description: Hypothesis registered
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DataEnvelopeEnrichmentHypothesis" }
+  /v1/smart-variables:
+    post:
+      operationId: registerSmartVariable
+      tags: [Enrichment]
+      security: [{ BearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/SmartVariable" }
+      responses:
+        "201":
+          description: Smart variable versioned
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DataEnvelopeSmartVariable" }
+  /v1/action-designs:
+    get:
+      operationId: listActionDesigns
+      tags: [Actions]
+      security: [{ BearerAuth: [] }]
+      parameters:
+        - name: useCaseId
+          in: query
+          schema: { type: string }
+        - $ref: "#/components/parameters/Cursor"
+        - $ref: "#/components/parameters/Limit"
+      responses:
+        "200":
+          description: Action designs
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ListEnvelopeActionDesign" }
+    post:
+      operationId: createActionDesign
+      tags: [Actions]
+      security: [{ BearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ActionDesign" }
+      responses:
+        "201":
+          description: Action design created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DataEnvelopeActionDesign" }
+  /v1/impact-claims:
+    get:
+      operationId: listImpactClaims
+      tags: [Impact]
+      security: [{ BearerAuth: [] }]
+      parameters:
+        - $ref: "#/components/parameters/Cursor"
+        - $ref: "#/components/parameters/Limit"
+      responses:
+        "200":
+          description: Impact claims
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ListEnvelopeImpactClaim" }
+    post:
+      operationId: submitImpactClaim
+      tags: [Impact]
+      security: [{ BearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ImpactClaim" }
+      responses:
+        "201":
+          description: Claim submitted
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DataEnvelopeImpactClaim" }
+        "409":
+          description: Rejected because People or Processes link is red
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Problem" }
+  /v1/impact-claims/{claimId}/attest:
+    parameters:
+      - name: claimId
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: attestImpactClaim
+      tags: [Impact]
+      security: [{ BearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/FinanceAttestation" }
+      responses:
+        "200":
+          description: Finance attested
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DataEnvelopeImpactClaim" }
+  /v1/privacy-controls:
+    get:
+      operationId: listPrivacyControls
+      tags: [Privacy]
+      security: [{ BearerAuth: [] }]
+      parameters:
+        - name: useCaseId
+          in: query
+          schema: { type: string }
+      responses:
+        "200":
+          description: Privacy controls
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ListEnvelopePrivacyControl" }
+    post:
+      operationId: upsertPrivacyControl
+      tags: [Privacy]
+      security: [{ BearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/PrivacyControl" }
+      responses:
+        "200":
+          description: Privacy control upserted
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DataEnvelopePrivacyControl" }
+  /v1/translator-coverage:
+    get:
+      operationId: getTranslatorCoverage
+      tags: [Governance]
+      security: [{ BearerAuth: [] }]
+      parameters:
+        - name: useCaseId
+          in: query
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: AQ translator coverage
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DataEnvelopeTranslatorCoverage" }
+  /v1/remediation-cases:
+    post:
+      operationId: openRemediationCase
+      tags: [Governance]
+      security: [{ BearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/RemediationCase" }
+      responses:
+        "201":
+          description: Remediation opened
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DataEnvelopeRemediationCase" }
+components:
+
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  parameters:
+    Cursor:
+      name: cursor
+      in: query
+      schema: { type: string }
+    Limit:
+      name: limit
+      in: query
+      schema: { type: integer, minimum: 1, maximum: 200, default: 50 }
+  responses:
+    Unauthorized:
+      description: Missing or invalid credentials
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Problem" }
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Problem" }
+    UnprocessableEntity:
+      description: Validation failed
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Problem" }
+
+  schemas:
+
+    ResponseMeta:
+      type: object
+      required: [requestId, timestamp]
+      properties:
+        requestId: { type: string }
+        timestamp: { type: string, format: date-time }
+    Problem:
+      type: object
+      required: [type, title, status]
+      properties:
+        type: { type: string, format: uri }
+        title: { type: string }
+        status: { type: integer }
+        detail: { type: string }
+
+    UseCase:
+      type: object
+      required: [id, name, category, targetKpi, status]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        category: { type: string, enum: [top_line, bottom_line, new_business_model] }
+        targetKpi: { type: string }
+        referenceImpactBand: { type: string, example: "churn 1.5% sales / maintenance 20-50% call center costs" }
+        status: { type: string, enum: [intake, enriching, acting, scaling, impact_attested, blocked] }
+        weakestLink: { type: string, enum: [data, analytics, it, people, processes, strategy, operating_model] }
+    LinkHealthScore:
+      type: object
+      required: [id, useCaseId, link, score, severity]
+      properties:
+        id: { type: string }
+        useCaseId: { type: string }
+        link: { type: string, enum: [data, analytics, it, people, processes, strategy, operating_model] }
+        score: { type: number, format: float, minimum: 0, maximum: 100 }
+        severity: { type: string, enum: [green, amber, red, critical_red] }
+        notes: { type: string }
+    EnrichmentHypothesis:
+      type: object
+      required: [id, useCaseId, domainOwner, hypothesis]
+      properties:
+        id: { type: string }
+        useCaseId: { type: string }
+        domainOwner: { type: string }
+        hypothesis: { type: string }
+        version: { type: integer }
+    SmartVariable:
+      type: object
+      required: [id, hypothesisId, name, expression]
+      properties:
+        id: { type: string }
+        hypothesisId: { type: string }
+        name: { type: string }
+        expression: { type: string }
+        version: { type: integer }
+    ActionDesign:
+      type: object
+      required: [id, useCaseId, actionType, status]
+      properties:
+        id: { type: string }
+        useCaseId: { type: string }
+        actionType: { type: string, enum: [process_redesign, incentive_change, automation, save_desk, work_order] }
+        status: { type: string, enum: [draft, active, completed] }
+        description: { type: string }
+        predictionAloneInsufficient: { type: boolean, default: true }
+    ImpactClaim:
+      type: object
+      required: [id, useCaseId, claimedLiftPercent, status]
+      properties:
+        id: { type: string }
+        useCaseId: { type: string }
+        claimedLiftPercent: { type: number, format: double }
+        status: { type: string, enum: [submitted, attested, rejected] }
+        rejectionReason: { type: string }
+        financeAttestationId: { type: string }
+    FinanceAttestation:
+      type: object
+      required: [attestedBy, period, verifiedLiftPercent]
+      properties:
+        id: { type: string }
+        attestedBy: { type: string }
+        period: { type: string }
+        verifiedLiftPercent: { type: number, format: double }
+        nonAdditiveAcknowledged: { type: boolean }
+    PrivacyControl:
+      type: object
+      required: [id, useCaseId, lawfulBasis, status]
+      properties:
+        id: { type: string }
+        useCaseId: { type: string }
+        lawfulBasis: { type: string }
+        status: { type: string, enum: [ok, blocking] }
+        framework: { type: string, example: GDPR }
+    TranslatorCoverage:
+      type: object
+      required: [useCaseId, rolesInScope, trainedPercent, thresholdPercent]
+      properties:
+        useCaseId: { type: string }
+        rolesInScope: { type: integer }
+        trainedPercent: { type: number, format: float }
+        thresholdPercent: { type: number, format: float }
+        meetsThreshold: { type: boolean }
+    RemediationCase:
+      type: object
+      required: [id, useCaseId, weakLink, status]
+      properties:
+        id: { type: string }
+        useCaseId: { type: string }
+        weakLink: { type: string }
+        status: { type: string, enum: [open, in_progress, closed] }
+        plan: { type: string }
+
+    DataEnvelopeUseCase:
+      type: object
+      required: [data, meta]
+      properties:
+        data: { $ref: "#/components/schemas/UseCase" }
+        meta: { $ref: "#/components/schemas/ResponseMeta" }
+    ListEnvelopeUseCase:
+      type: object
+      required: [data, meta]
+      properties:
+        data:
+          type: object
+          required: [items]
+          properties:
+            items:
+              type: array
+              items: { $ref: "#/components/schemas/UseCase" }
+            nextCursor: { type: string }
+        meta: { $ref: "#/components/schemas/ResponseMeta" }
+
+    DataEnvelopeLinkHealthScore:
+      type: object
+      required: [data, meta]
+      properties:
+        data: { $ref: "#/components/schemas/LinkHealthScore" }
+        meta: { $ref: "#/components/schemas/ResponseMeta" }
+    ListEnvelopeLinkHealthScore:
+      type: object
+      required: [data, meta]
+      properties:
+        data:
+          type: object
+          required: [items]
+          properties:
+            items:
+              type: array
+              items: { $ref: "#/components/schemas/LinkHealthScore" }
+            nextCursor: { type: string }
+        meta: { $ref: "#/components/schemas/ResponseMeta" }
+
+    DataEnvelopeEnrichmentHypothesis:
+      type: object
+      required: [data, meta]
+      properties:
+        data: { $ref: "#/components/schemas/EnrichmentHypothesis" }
+        meta: { $ref: "#/components/schemas/ResponseMeta" }
+    ListEnvelopeEnrichmentHypothesis:
+      type: object
+      required: [data, meta]
+      properties:
+        data:
+          type: object
+          required: [items]
+          properties:
+            items:
+              type: array
+              items: { $ref: "#/components/schemas/EnrichmentHypothesis" }
+            nextCursor: { type: string }
+        meta: { $ref: "#/components/schemas/ResponseMeta" }
+
+    DataEnvelopeSmartVariable:
+      type: object
+      required: [data, meta]
+      properties:
+        data: { $ref: "#/components/schemas/SmartVariable" }
+        meta: { $ref: "#/components/schemas/ResponseMeta" }
+    ListEnvelopeSmartVariable:
+      type: object
+      required: [data, meta]
+      properties:
+        data:
+          type: object
+          required: [items]
+          properties:
+            items:
+              type: array
+              items: { $ref: "#/components/schemas/SmartVariable" }
+            nextCursor: { type: string }
+        meta: { $ref: "#/components/schemas/ResponseMeta" }
+
+    DataEnvelopeActionDesign:
+      type: object
+      required: [data, meta]
+      properties:
+        data: { $ref: "#/components/schemas/ActionDesign" }
+        meta: { $ref: "#/components/schemas/ResponseMeta" }
+    ListEnvelopeActionDesign:
+      type: object
+      required: [data, meta]
+      properties:
+        data:
+          type: object
+          required: [items]
+          properties:
+            items:
+              type: array
+              items: { $ref: "#/components/schemas/ActionDesign" }
+            nextCursor: { type: string }
+        meta: { $ref: "#/components/schemas/ResponseMeta" }
+
+    DataEnvelopeImpactClaim:
+      type: object
+      required: [data, meta]
+      properties:
+        data: { $ref: "#/components/schemas/ImpactClaim" }
+        meta: { $ref: "#/components/schemas/ResponseMeta" }
+    ListEnvelopeImpactClaim:
+      type: object
+      required: [data, meta]
+      properties:
+        data:
+          type: object
+          required: [items]
+          properties:
+            items:
+              type: array
+              items: { $ref: "#/components/schemas/ImpactClaim" }
+            nextCursor: { type: string }
+        meta: { $ref: "#/components/schemas/ResponseMeta" }
+
+    DataEnvelopePrivacyControl:
+      type: object
+      required: [data, meta]
+      properties:
+        data: { $ref: "#/components/schemas/PrivacyControl" }
+        meta: { $ref: "#/components/schemas/ResponseMeta" }
+    ListEnvelopePrivacyControl:
+      type: object
+      required: [data, meta]
+      properties:
+        data:
+          type: object
+          required: [items]
+          properties:
+            items:
+              type: array
+              items: { $ref: "#/components/schemas/PrivacyControl" }
+            nextCursor: { type: string }
+        meta: { $ref: "#/components/schemas/ResponseMeta" }
+
+    DataEnvelopeTranslatorCoverage:
+      type: object
+      required: [data, meta]
+      properties:
+        data: { $ref: "#/components/schemas/TranslatorCoverage" }
+        meta: { $ref: "#/components/schemas/ResponseMeta" }
+    ListEnvelopeTranslatorCoverage:
+      type: object
+      required: [data, meta]
+      properties:
+        data:
+          type: object
+          required: [items]
+          properties:
+            items:
+              type: array
+              items: { $ref: "#/components/schemas/TranslatorCoverage" }
+            nextCursor: { type: string }
+        meta: { $ref: "#/components/schemas/ResponseMeta" }
+
+    DataEnvelopeRemediationCase:
+      type: object
+      required: [data, meta]
+      properties:
+        data: { $ref: "#/components/schemas/RemediationCase" }
+        meta: { $ref: "#/components/schemas/ResponseMeta" }
+    ListEnvelopeRemediationCase:
+      type: object
+      required: [data, meta]
+      properties:
+        data:
+          type: object
+          required: [items]
+          properties:
+            items:
+              type: array
+              items: { $ref: "#/components/schemas/RemediationCase" }
+            nextCursor: { type: string }
+        meta: { $ref: "#/components/schemas/ResponseMeta" }
+
